@@ -1,5 +1,6 @@
+require 'account_status_helper'
 class ClientsController < ApplicationController
-    skip_before_action :authorized, only: [:create]
+  skip_before_action :authorized, only: [:create]
 
   def index
     @clients = Client.all
@@ -13,8 +14,9 @@ class ClientsController < ApplicationController
   
 
   def create
-    return render json: { error: 'client email already in use'}, status: :conflict if Client.exists?({email: client_params[:email]})
-    @client = Client.create!(client_params)
+    return render json: { error: 'client email already in use'}, status: :conflict if Client.exists?({email: client_params(false)[:email]})
+    params['client']['account_status'] = 'processing'
+    @client = Client.create!(client_params(true))
     if @client.valid?
       @token = encode_token(client_id: @client.id)
       render json: { client: ClientSerializer.new(@client), jwt: @token }, status: :created
@@ -23,10 +25,42 @@ class ClientsController < ApplicationController
         render json: { error: 'failed to create client', email: @client.errors.full_messages}, status: :unprocessable_entity
     end
   end
+  
+  def activate
+      id = params[:id].to_i
+
+      @client = Client.find_by_id(id)
+      if @client.nil?
+         failure_message = { error: "ID: #{params[:id]} not found" }
+         return render  json: failure_message, status: :not_found
+      end
+      status = @client.account_status
+      response = AccountStatusHelper.activate("Client", @client, status, id)
+      return render json: response[:message], status: response[:status]
+  end
+  
+  def account_status_update
+      id = params[:id].to_i
+      status = params[:status]
+
+      @client = Client.find_by_id(id)
+      if @client.nil?
+         failure_message = { error: "ID: #{params[:id]} not found" }
+         return render  json: failure_message, status: :not_found
+      end
+      
+      response = AccountStatusHelper.account_status("Client", @client, status, id)
+      return render json: response[:message], status: response[:status]
+  end
 
   def update
-    @client = Client.find(params[:id])
-    if @client.update(client_params)
+    @client = Client.find_by_id(params[:id])
+    
+    if @client.nil?
+       failure_message = { error: "ID: #{params[:id]} not found" }
+       return render  json: failure_message, status: :not_found
+    end
+    if @client.update(client_params(false))
       render json: @client
     else
         failure_message = {}
@@ -109,19 +143,36 @@ class ClientsController < ApplicationController
 
   private
 
-  def client_params
-    params.require(:client).permit(
-      :email,
-      :password,
-      :first_name,
-      :last_name,
-      #:account_status,
-      #:address_street,
-      #:address_city,
-      #:address_zip,
-      #:address_state,
-      #:ethnicity,
-      #:gender
-    )
+  def client_params(shouldPermitAccountStatus)
+    if shouldPermitAccountStatus
+        params.require(:client).permit(
+          :email,
+          :password,
+          :first_name,
+          :last_name,
+          :account_status
+          #:address_street,
+          #:address_city,
+          #:address_zip,
+          #:address_state,
+          #:ethnicity,
+          #:gender
+        )
+    else
+      params.require(:client).permit(
+        :email,
+        :password,
+        :first_name,
+        :last_name
+        #:account_status,
+        #:address_street,
+        #:address_city,
+        #:address_zip,
+        #:address_state,
+        #:ethnicity,
+        #:gender
+      )
+    end
   end
 end
+
