@@ -4,8 +4,8 @@ RUN mkdir /banana-rails
 WORKDIR /banana-rails
 
 # gem install
-COPY Gemfile /banana-rails/Gemfile
-COPY Gemfile.lock /banana-rails/Gemfile.lock
+COPY ../Gemfile /banana-rails/Gemfile
+COPY ../Gemfile.lock /banana-rails/Gemfile.lock
 RUN bundle install
 RUN gem install pg -v '1.1.4' --source 'https://rubygems.org/'
 
