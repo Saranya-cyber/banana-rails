@@ -2,4 +2,4 @@ name: 'Runs tests'
 description: 'Run the tests'
 runs:
     using: docker
-    image: 'TestDockerfile'
+    image: '../TestDockerfile'
