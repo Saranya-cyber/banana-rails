@@ -13,6 +13,7 @@ class DonorsController < ApplicationController
 		render json: @donor.donations, include: 'claims', status: :ok
 	end
 
+    
 	def create
 		return render json: { error: 'donor email already in use'}, status: :conflict if Donor.exists?({email: donor_params(false)[:email]})
         params['donor']['account_status'] = 'processing'
@@ -78,8 +79,17 @@ class DonorsController < ApplicationController
 		if @donor.update(donor_params(false))
 			render json: @donor
 		else
-			failure_message = { error: "Donor id: #{params[:id]} was not updated. #{@donor.errors.full_messages}" }
-			render json: failure_message
+			failure_message = {}
+            failure_message['message'] = "Donor id: #{params[:id]} was not updated."
+            failure_message['field_errors'] = []
+            @donor.errors.each do |attr_name, attr_value|
+                message = {}
+                message['field'] = attr_name
+                message['message'] = attr_value
+                failure_message['field_errors'] << message
+            end
+            render json: failure_message, status: :bad_request
+            puts failure_message
 		end
 	end
 
@@ -142,3 +152,4 @@ class DonorsController < ApplicationController
         end
 	end
 end
+
