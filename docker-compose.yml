@@ -12,13 +12,11 @@ services:
       - "5432:5432"
   web:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails test"
     ## map all the files from current file to /bananrails in the web container
     ## where the hot reload features from
     volumes:
       - .:/banana-rails
-    ports:
-      - "3000:3000"
     depends_on:
       - db
 volumes:
