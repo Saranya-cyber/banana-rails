@@ -1,5 +1,6 @@
+require 'account_status_helper'
 class ClientsController < ApplicationController
-    skip_before_action :authorized, only: [:create]
+  skip_before_action :authorized, only: [:create]
 
   def index
     @clients = Client.all
@@ -24,56 +25,41 @@ class ClientsController < ApplicationController
         render json: { error: 'failed to create client', email: @client.errors.full_messages}, status: :unprocessable_entity
     end
   end
-
+  
   def activate
       id = params[:id].to_i
 
-      @client = Client.find(id)
-      status = @client.account_status
-
-      failure_message = { error: "Client id: #{id} status not changed to active.  Remained: #{@client.account_status}" }
-
-      if status == 'approved'
-        success_message = { message: "Client id: #{id} status changed to active. Was: #{status}" }
-        success = @client.update_attribute(:account_status, 'active')
-      elsif status == 'active'
-          success_message = { message: "Client id: #{id} status was not updated as the user is already active" }
-          success = true
-      else
-          success = false
+      @client = Client.find_by_id(id)
+      if @client.nil?
+         failure_message = { error: "ID: #{params[:id]} not found" }
+         return render  json: failure_message, status: :not_found
       end
-
-      success ?
-          (render json: success_message, status: :ok) :
-          (render json: failure_message, status: :bad_request)
+      status = @client.account_status
+      response = AccountStatusHelper.activate("Client", @client, status, id)
+      return render json: response[:message], status: response[:status]
   end
   
   def account_status_update
       id = params[:id].to_i
       status = params[:status]
 
-      @client = Client.find(id)
-      success_message = { message: "Client id: #{id} status changed to #{status}. Was: #{@client.account_status}" }
-      failure_message = { error: "Client id: #{id} status not changed to #{status}.  Remained: #{@client.account_status}" }
-
-      case status
-      when 'approved'
-          success = @client.update_attribute(:account_status, 'approved')
-      when 'processing'
-          success = @client.update_attribute(:account_status, 'processing')
-      when 'active'
-          success = @client.update_attribute(:account_status, 'active')
-      when 'suspended'
-          success = @client.update_attribute(:account_status, 'suspended')
+      @client = Client.find_by_id(id)
+      if @client.nil?
+         failure_message = { error: "ID: #{params[:id]} not found" }
+         return render  json: failure_message, status: :not_found
       end
-
-      success ?
-          (render json: success_message, status: :ok) :
-          (render json: failure_message, status: :unprocessable_entity)
+      
+      response = AccountStatusHelper.account_status("Client", @client, status, id)
+      return render json: response[:message], status: response[:status]
   end
 
   def update
-    @client = Client.find(params[:id])
+    @client = Client.find_by_id(params[:id])
+    
+    if @client.nil?
+       failure_message = { error: "ID: #{params[:id]} not found" }
+       return render  json: failure_message, status: :not_found
+    end
     if @client.update(client_params(false))
       render json: @client
     else
@@ -164,7 +150,7 @@ class ClientsController < ApplicationController
           :password,
           :first_name,
           :last_name,
-          :account_status,
+          :account_status
           #:address_street,
           #:address_city,
           #:address_zip,
@@ -177,7 +163,7 @@ class ClientsController < ApplicationController
         :email,
         :password,
         :first_name,
-        :last_name,
+        :last_name
         #:account_status,
         #:address_street,
         #:address_city,

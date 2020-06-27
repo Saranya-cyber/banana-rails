@@ -1,3 +1,4 @@
+require 'account_status_helper'
 class DonorsController < ApplicationController
 	skip_before_action :authorized, only: [:create]
 
@@ -27,55 +28,40 @@ class DonorsController < ApplicationController
         end
     end
 
+    
     def activate
         id = params[:id].to_i
-
-        @donor = Donor.find(id)
-        status = @donor.account_status
-
-        failure_message = { error: "Donor id: #{id} status not changed to active.  Remained: #{status}" }
-
-        if status == 'approved'
-          success_message = { message: "Donor id: #{id} status changed to active. Was: #{status}" }
-          success = @donor.update_attribute(:account_status, 'active')
-        elsif status == 'active'
-            success_message = { message: "Donor id: #{id} status was not updated as the user is already active" }
-            success = true
-        else
-            success = false
+        @donor = Donor.find_by_id(id)
+        if @donor.nil?
+           failure_message = { error: "ID: #{params[:id]} not found" }
+           return render  json: failure_message, status: :not_found
         end
-
-        success ?
-            (render json: success_message, status: :ok) :
-            (render json: failure_message, status: :bad_request)
+        status = @donor.account_status
+        response = AccountStatusHelper.activate("Donor", @donor, status, id)
+        return render json: response[:message], status: response[:status]
     end
-
+    
 	def account_status_update
 		id = params[:id].to_i
 		status = params[:status]
 
-		@donor = Donor.find(id)
-		success_message = { message: "Donor id: #{id} status changed to #{status}. Was: #{@donor.account_status}" }
-		failure_message = { error: "Donor id: #{id} status not changed to #{status}.  Remained: #{@donor.account_status}" }
-
-		case status
-		when 'approved'
-			success = @donor.update_attribute(:account_status, 'approved')
-		when 'processing'
-			success = @donor.update_attribute(:account_status, 'processing')
-		when 'active'
-			success = @donor.update_attribute(:account_status, 'active')
-		when 'suspended'
-			success = @donor.update_attribute(:account_status, 'suspended')
-		end
-
-		success ?
-			(render json: success_message, status: :ok) :
-			(render json: failure_message, status: :bad_request)
+		@donor = Donor.find_by_id(id)
+        if @donor.nil?
+           failure_message = { error: "ID: #{params[:id]} not found" }
+           return render  json: failure_message, status: :not_found
+        end
+		
+        response = AccountStatusHelper.account_status("Donor", @donor, status, id)
+        return render json: response[:message], status: response[:status]
 	end
 
+    
 	def update
-		@donor = Donor.find(params[:id])
+		@donor = Donor.find_by_id(params[:id])
+        if @donor.nil?
+           failure_message = { error: "ID: #{params[:id]} not found" }
+           return render  json: failure_message, status: :not_found
+        end
 		if @donor.update(donor_params(false))
 			render json: @donor
 		else
@@ -89,10 +75,10 @@ class DonorsController < ApplicationController
                 failure_message['field_errors'] << message
             end
             render json: failure_message, status: :bad_request
-            puts failure_message
 		end
 	end
 
+    
 	def scan_qr_code
 		claim = JSON.parse(Base64.decode64(params[:qr_code]))
 		@claim = Claim.find_by(client_id: claim.client_id, donation_id: claim.donation_id)
