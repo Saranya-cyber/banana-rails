@@ -6,5 +6,10 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: ./action-test
+      - name: Checkout code
+        uses: actions/checkout@v1
+        id: checkout
+      - name: Docker compose
+        run: docker-compose up
+      -name: Run via docker
+        run: docker-compose run --rm console bash -c "bundle install && rails db:prepare && rspec"
