@@ -11,5 +11,5 @@ jobs:
         id: checkout
       - name: Docker compose
         run: docker-compose up
-      -name: Run via docker
+      - name: Run via docker
         run: docker-compose run --rm console bash -c "bundle install && rails db:prepare && rspec"
