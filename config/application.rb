@@ -36,3 +36,8 @@ module Backend
     config.autoload_paths += %W(#{config.root}/app/util)
   end
 end
+
+#Not sure if this is the right place, experienced rails devs?
+module AccountStatus
+  PROCESSING = 'processing'
+end

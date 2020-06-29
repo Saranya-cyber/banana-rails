@@ -15,9 +15,8 @@ class DonorsController < ApplicationController
 	end
 
 	def create
-		return render json: { error: 'donor email already in use'}, status: :conflict if Donor.exists?({email: donor_params(false)[:email]})
-        params['donor']['account_status'] = 'processing'
-		@donor = Donor.create!(donor_params(true))
+		return render json: { error: 'donor email already in use'}, status: :conflict if Donor.exists?({email: donor_params[:email]})
+		@donor = Donor.create!(donor_params)
 		if @donor.valid?
 			@token = encode_token(donor_id: @donor.id)
 			session[:donor_id] = @donor.id
@@ -61,7 +60,7 @@ class DonorsController < ApplicationController
            failure_message = { error: "ID: #{params[:id]} not found" }
            return render  json: failure_message, status: :not_found
         end
-		if @donor.update(donor_params(false))
+		if @donor.update(donor_params)
 			render json: @donor
 		else
 			failure_message = {}
@@ -97,44 +96,20 @@ class DonorsController < ApplicationController
 
 	private
 
-	def donor_params(shouldPermitAccountStatus)
-        if shouldPermitAccountStatus
-            params.require(:donor).permit(
-			   :email,
-			   :password,
-			   :first_name,
-			   :last_name,
-			   :organization_name,
-			   :address_street,
-			   :address_city,
-			   :address_state,
-			   :address_zip,
-               :pickup_instructions,
-			   :account_status
-			   # :business_license,
-			   # :business_phone_number,
-			   # :business_doc_id,
-			   # :profile_pic_link
-		   )
-        else
-           params.require(:donor).permit(
-              :id,
-              :email,
-              :password,
-              :first_name,
-              :last_name,
-              :organization_name,
-              :address_street,
-              :address_city,
-              :address_state,
-              :address_zip,
-              :pickup_instructions
-              # :business_license,
-              # :business_phone_number,
-              # :business_doc_id,
-              # :profile_pic_link
-           )
-        end
-	end
+		def donor_params
+			params.require(:donor).permit(
+					:id,
+					:email,
+					:password,
+					:first_name,
+					:last_name,
+					:organization_name,
+					:address_street,
+					:address_city,
+					:address_state,
+					:address_zip,
+					:pickup_instructions
+			)
+		end
 end
 
