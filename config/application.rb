@@ -1,5 +1,4 @@
 require_relative 'boot'
-
 require "rails"
 # Pick the frameworks you want:
 require "active_model/railtie"
@@ -37,7 +36,4 @@ module Backend
   end
 end
 
-#Not sure if this is the right place, experienced rails devs?
-module AccountStatus
-  PROCESSING = 'processing'
-end
+

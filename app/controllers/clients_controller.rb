@@ -1,6 +1,7 @@
 require 'account_status_helper'
 class ClientsController < ApplicationController
-  skip_before_action :authorized, only: [:create]
+  include AccountStatus
+  skip_before_action :authorized, only: [:create, :update, :account_status_update, :activate]
 
   def index
     @clients = Client.all
@@ -21,7 +22,7 @@ class ClientsController < ApplicationController
       render json: { client: ClientSerializer.new(@client), jwt: @token }, status: :created
     else
         @client.errors.full_messages
-        render json: { error: 'failed to create client', email: @client.errors.full_messages}, status: :unprocessable_entity
+        render json: { error: 'failed to create client', email: @client.errors.full_messages}, status: :bad_request
     end
   end
   
@@ -34,7 +35,7 @@ class ClientsController < ApplicationController
          return render  json: failure_message, status: :not_found
       end
       status = @client.account_status
-      response = AccountStatusHelper.activate("Client", @client, status, id)
+      response = AccountStatusHelper.activate("Client", @client,status, id)
       return render json: response[:message], status: response[:status]
   end
   

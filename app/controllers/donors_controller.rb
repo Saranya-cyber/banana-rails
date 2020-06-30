@@ -1,6 +1,6 @@
 require 'account_status_helper'
 class DonorsController < ApplicationController
-    skip_before_action :authorized, only: [:create]
+    skip_before_action :authorized, only: [:create, :activate, :account_status_update, :update]
 
 	def get_donations
 		id = params[:id].to_i
