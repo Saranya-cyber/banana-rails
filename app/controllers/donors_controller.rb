@@ -1,6 +1,6 @@
 require 'account_status_helper'
 class DonorsController < ApplicationController
-    skip_before_action :authorized, only: [:create, :activate, :account_status_update, :update]
+    skip_before_action :authorized, only: [:create]
 
 	def get_donations
 		id = params[:id].to_i
@@ -16,7 +16,7 @@ class DonorsController < ApplicationController
 
 	def create
 		return render json: { error: 'donor email already in use'}, status: :conflict if Donor.exists?({email: donor_params[:email]})
-		@donor = Donor.create!(donor_params)
+		@donor = Donor.create(donor_params)
 		if @donor.valid?
 			@token = encode_token(donor_id: @donor.id)
 			session[:donor_id] = @donor.id
@@ -26,19 +26,7 @@ class DonorsController < ApplicationController
             render json: { error: 'failed to create donor' }, status: :bad_request
         end
     end
-    
-    def activate
-        id = params[:id].to_i
-        @donor = Donor.find_by_id(id)
-        if @donor.nil?
-           failure_message = { error: "ID: #{params[:id]} not found" }
-           return render  json: failure_message, status: :not_found
-        end
-        status = @donor.account_status
-        response = AccountStatusHelper.activate("Donor", @donor, status, id)
-        return render json: response[:message], status: response[:status]
-    end
-    
+
 	def account_status_update
 		id = params[:id].to_i
 		status = params[:status]
@@ -53,7 +41,6 @@ class DonorsController < ApplicationController
         return render json: response[:message], status: response[:status]
 	end
 
-    
 	def update
 		@donor = Donor.find_by_id(params[:id])
         if @donor.nil?
@@ -76,7 +63,6 @@ class DonorsController < ApplicationController
 		end
 	end
 
-    
 	def scan_qr_code
 		claim = JSON.parse(Base64.decode64(params[:qr_code]))
 		@claim = Claim.find_by(client_id: claim.client_id, donation_id: claim.donation_id)
