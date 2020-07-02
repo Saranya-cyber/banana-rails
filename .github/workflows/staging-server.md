@@ -30,6 +30,8 @@ and copy the public key to your clipboard and add it as deploy key for the repo:
 
 ##Todos
 1. Store instance private key and deploy key in 1password. 
+2. Use an easier to remember DNS (dev.bananapp.org or something).
+3. Review performance.
 
 
     
