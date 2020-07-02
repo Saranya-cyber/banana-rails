@@ -26,12 +26,13 @@ and copy the public key to your clipboard and add it as deploy key for the repo:
 6. Add or update the `STG_SERVER` secret to the public DNS https://github.com/FoodIsLifeBGP/banana-rails/settings/secrets 
 (you'll need to be a repo owner)
 7. Add or update the `STG_PRIVATE_KEY` secret so that it's the private key string from step 2.
-8. Edit or add a security group that allows inbound traffic on port 3000.
+8. Edit or add an EC2 security group attached to your new instance that allows inbound traffic on port 3000.
 
 ##Todos
 1. Store instance private key and deploy key in 1password. 
 2. Use an easier to remember DNS (dev.bananapp.org or something).
 3. Review performance.
+4. Switch to an instance that belongs to the banana app AWS account.
 
 
     
