@@ -10,7 +10,7 @@ coast availability zone or something like digital ocean.
 ## To set up and use new CD server
 1. Create new EC2 instance using an ubuntu image (ami-0ac80df6eff0e70b5 is what was used initially)
 2. Save the ssh keypair and make note of the public DNS
-3. ssh to the new instance `"ssh ~/.ssh/banana.pem" ubuntu@<public-dbs>`
+3. ssh to the new instance `"ssh ~/.ssh/banana.pem" ubuntu@<public-dns>`
 4. On the new EC2 instance install the following software. We can automate this as part of instance creation or save a new AWS image later.
     1. `sudo apt-get update`
     2. `curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -`
@@ -27,6 +27,9 @@ and copy the public key to your clipboard and add it as deploy key for the repo:
 (you'll need to be a repo owner)
 7. Add or update the `STG_PRIVATE_KEY` secret so that it's the private key string from step 2.
 8. Edit or add a security group that allows inbound traffic on port 3000.
+
+##Todos
+1. Store instance private key and deploy key in 1password. 
 
 
     
