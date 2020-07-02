@@ -19,7 +19,7 @@ jobs:
             sudo docker-compose down
             cd ..
             sudo rm -rf banana-rails
-            git clone git@github.com:sagehen03/banana-rails.git --depth=1
+            git clone git@github.com:FoodIsLifeBGP/banana-rails.git --depth=1
             cd banana-rails || exit 1
             touch dev.env
             sudo docker-compose up -d
