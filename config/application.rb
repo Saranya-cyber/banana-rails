@@ -36,4 +36,12 @@ module Backend
   end
 end
 
-
+module AccountStatus
+  PROCESSING = 'processing'
+  APPROVED = 'approved'
+  ACTIVE = 'active'
+  INCOMPLETE = 'incomplete'
+  INACTIVE = 'inactive'
+  SUSPENDED = 'suspended'
+  CLOSED = 'closed'
+end

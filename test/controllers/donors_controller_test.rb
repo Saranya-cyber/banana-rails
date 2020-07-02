@@ -31,4 +31,28 @@ class DonorsControllerTest < ActionDispatch::IntegrationTest
     assert_equal AccountStatus::PROCESSING, just_added.account_status, "account_status should default to #{AccountStatus::PROCESSING} if not specified"
   end
 
+  test "data that fails donor registration returns an error response" do
+    post donors_create_url, params: {donor: { email: "acc_status_notindb@notindb.com", password: "password", organization_name: "The Org",
+                                                address_zip: 90210, first_name: "Newname", last_name: "Client"}}
+    assert_response :bad_request
+    res_obj = JSON.parse @response.body
+    assert_equal 'Password is invalid', res_obj['errors'][0], 'should have returned invalid password'
+
+  end
+
+  test "we can update account_status for a donor" do
+    patch '/donors/1/updateStatus', params: {status: AccountStatus::SUSPENDED}, headers: {'Authorization' => "Bearer #{JWT.encode({donor_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    assert_response :success
+  end
+
+  test "notify caller when donor already has requested status" do
+    patch '/donors/1/updateStatus', params: {status: AccountStatus::ACTIVE}, headers: {'Authorization' => "Bearer #{JWT.encode({donor_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    assert_response 204
+  end
+
+  test "notify caller when requested donor status is invalid" do
+    patch '/donors/1/updateStatus', params: {status: 'invalid!!'}, headers: {'Authorization' => "Bearer #{JWT.encode({donor_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    assert_response :bad_request
+  end
+
 end

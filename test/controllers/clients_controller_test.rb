@@ -25,4 +25,28 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     assert_equal AccountStatus::PROCESSING, just_added.account_status, "account_status should have defaulted to #{AccountStatus::PROCESSING}"
   end
 
+  test "data that fails client registration returns an error response and doesn't write to db" do
+    post clients_create_url, params: {client: { email: "acc_status_notindb@notindb.com", password: "password",
+                                                address_zip: 90210, first_name: "Newname", last_name: "Client"}}
+    assert_response :bad_request
+    res_obj = JSON.parse @response.body
+    assert_equal 'Password is invalid', res_obj['errors'][0], 'should have returned invalid password'
+
+  end
+
+  test "we can update account_status for a client" do
+    patch '/clients/1/updateStatus', params: {status: AccountStatus::SUSPENDED}, headers: {'Authorization' => "Bearer #{JWT.encode({client_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    assert_response :success
+  end
+
+  test "notify caller when client already has requested status" do
+    patch '/clients/1/updateStatus', params: {status: AccountStatus::ACTIVE}, headers: {'Authorization' => "Bearer #{JWT.encode({client_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    assert_response 204
+  end
+
+  test "notify caller when requested status is invalid" do
+    patch '/clients/1/updateStatus', params: {status: 'invalid!!'}, headers: {'Authorization' => "Bearer #{JWT.encode({client_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    assert_response :bad_request
+  end
+
 end

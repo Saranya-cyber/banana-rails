@@ -22,23 +22,22 @@ class DonorsController < ApplicationController
 			session[:donor_id] = @donor.id
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
-            @donor.errors.full_messages
-            render json: { error: 'failed to create donor' }, status: :bad_request
-        end
-    end
+			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
+		end
+	end
 
 	def account_status_update
 		id = params[:id].to_i
 		status = params[:status]
 
 		@donor = Donor.find_by_id(id)
-        if @donor.nil?
-           failure_message = { error: "ID: #{params[:id]} not found" }
-           return render  json: failure_message, status: :not_found
-        end
-		
-        response = AccountStatusHelper.account_status("Donor", @donor, status, id)
-        return render json: response[:message], status: response[:status]
+		if @donor.nil?
+			 failure_message = { error: "ID: #{params[:id]} not found" }
+			 return render  json: failure_message, status: :not_found
+		end
+
+		response = AccountStatusHelper.account_status("Donor", @donor, status, id)
+		render json: { message: response[:message] }, status: response[:status]
 	end
 
 	def update

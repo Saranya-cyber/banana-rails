@@ -20,8 +20,7 @@ class ClientsController < ApplicationController
       @token = encode_token(client_id: @client.id)
       render json: { client: ClientSerializer.new(@client), jwt: @token }, status: :created
     else
-        @client.errors.full_messages
-        render json: { error: 'failed to create client', email: @client.errors.full_messages}, status: :bad_request
+        render json: { error: 'failed to create client', errors: @client.errors.full_messages}, status: :bad_request
     end
   end
   
@@ -31,12 +30,11 @@ class ClientsController < ApplicationController
 
       @client = Client.find_by_id(id)
       if @client.nil?
-         failure_message = { error: "ID: #{params[:id]} not found" }
-         return render  json: failure_message, status: :not_found
+         return render json: { error: "ID: #{params[:id]} not found" }, status: :not_found
       end
       
       response = AccountStatusHelper.account_status("Client", @client, status, id)
-      return render json: response[:message], status: response[:status]
+      render json: { message: response[:message] }, status: response[:status]
   end
 
   def update
