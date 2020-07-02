@@ -26,6 +26,7 @@ and copy the public key to your clipboard and add it as deploy key for the repo:
 6. Add or update the `STG_SERVER` secret to the public DNS https://github.com/FoodIsLifeBGP/banana-rails/settings/secrets 
 (you'll need to be a repo owner)
 7. Add or update the `STG_PRIVATE_KEY` secret so that it's the private key string from step 2.
+8. Edit or add a security group that allows inbound traffic on port 3000.
 
 
     
