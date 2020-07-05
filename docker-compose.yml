@@ -23,6 +23,13 @@ services:
       - db
     env_file:
     - dev.env
+  ## run rails db:setup against the database so that the fixture data is in place
+  seeder:
+    command: rails db:setup
+    build: .
+    restart: on-failure
+    depends_on:
+      - db
 volumes:
   pgdata:
   
