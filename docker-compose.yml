@@ -25,7 +25,7 @@ services:
     - dev.env
   ## run rails db:setup against the database so that the fixture data is in place
   seeder:
-    command: rails db:setup
+    command: rails db:setup && rails db:migrate
     build: .
     restart: on-failure
     depends_on:
