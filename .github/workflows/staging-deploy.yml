@@ -2,7 +2,7 @@ name: Staging deploy
 on:
   push:
     branches:
-      - hf-dbmigration
+      - prealpha/main
 jobs:
   deploy:
     name: deploy to staging
