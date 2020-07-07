@@ -41,17 +41,17 @@ class DonorsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "we can update account_status for a donor" do
-    patch '/donors/1/updateStatus', params: {status: AccountStatus::SUSPENDED}, headers: {'Authorization' => "Bearer #{JWT.encode({donor_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    patch '/donors/1/updateStatus', params: {status: AccountStatus::SUSPENDED}, headers: auth_header({donor_id: 1})
     assert_response :success
   end
 
   test "notify caller when donor already has requested status" do
-    patch '/donors/1/updateStatus', params: {status: AccountStatus::ACTIVE}, headers: {'Authorization' => "Bearer #{JWT.encode({donor_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    patch '/donors/1/updateStatus', params: {status: AccountStatus::ACTIVE}, headers: auth_header({donor_id: 1})
     assert_response 204
   end
 
   test "notify caller when requested donor status is invalid" do
-    patch '/donors/1/updateStatus', params: {status: 'invalid!!'}, headers: {'Authorization' => "Bearer #{JWT.encode({donor_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    patch '/donors/1/updateStatus', params: {status: 'invalid!!'}, headers: auth_header({donor_id: 1})
     assert_response :bad_request
   end
 

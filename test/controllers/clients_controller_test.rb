@@ -35,17 +35,17 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "we can update account_status for a client" do
-    patch '/clients/1/updateStatus', params: {status: AccountStatus::SUSPENDED}, headers: {'Authorization' => "Bearer #{JWT.encode({client_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    patch '/clients/1/updateStatus', params: {status: AccountStatus::SUSPENDED}, headers: auth_header({client_id: 1})
     assert_response :success
   end
 
   test "notify caller when client already has requested status" do
-    patch '/clients/1/updateStatus', params: {status: AccountStatus::ACTIVE}, headers: {'Authorization' => "Bearer #{JWT.encode({client_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    patch '/clients/1/updateStatus', params: {status: AccountStatus::ACTIVE}, headers: auth_header({client_id: 1})
     assert_response 204
   end
 
   test "notify caller when requested status is invalid" do
-    patch '/clients/1/updateStatus', params: {status: 'invalid!!'}, headers: {'Authorization' => "Bearer #{JWT.encode({client_id: 1}, Rails.application.secrets.secret_key_base)}"}
+    patch '/clients/1/updateStatus', params: {status: 'invalid!!'}, headers: auth_header({client_id: 1})
     assert_response :bad_request
   end
 

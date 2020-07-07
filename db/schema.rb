@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_29_184231) do
+ActiveRecord::Schema.define(version: 2020_07_07_021812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "hstore"
@@ -62,16 +62,13 @@ ActiveRecord::Schema.define(version: 2020_06_29_184231) do
 
   create_table "donations", force: :cascade do |t|
     t.string "food_name"
-    t.string "measurement"
-    t.integer "per_person"
-    t.integer "total_servings"
     t.integer "donor_id"
-    t.integer "duration_minutes"
-    t.string "image_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "canceled", default: false
-    t.string "pickup_location"
+    t.string "category"
+    t.string "total_amount"
+    t.string "pickup_instructions"
+    t.string "status"
   end
 
   create_table "donors", force: :cascade do |t|
