@@ -19,6 +19,7 @@ class DonationsController < ApplicationController
 	end
 
 	def create
+		puts 'hello!!'
 		@donation = Donation.create(donation_params)
 		if @donation.valid?
 			render json: { donation: DonationSerializer.new(@donation) }, status: :created
