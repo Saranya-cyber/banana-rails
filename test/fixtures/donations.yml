@@ -1,1 +1,28 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+to_expire:
+  id: 1
+  donor_id: 1
+  food_name: 'expired food'
+  created_at: <%= 2.days.ago %>
+  category: <%= DonationCategory::DAIRY %>
+  total_amount: '3 gallons'
+  pickup_instructions: 'Around the back'
+  status: <%= DonationStatus::ACTIVE %>
+active:
+  id: 2
+  donor_id: 1
+  food_name: 'not expired food'
+  created_at: <%= 2.hours.ago %>
+  category: <%= DonationCategory::DAIRY %>
+  total_amount: '3 gallons'
+  pickup_instructions: 'Around the back'
+  status: <%= DonationStatus::ACTIVE %>
+closed:
+  id: 3
+  donor_id: 1
+  food_name: 'closed donation'
+  created_at: <%= 3.days.ago %>
+  category: <%= DonationCategory::PRODUCE %>
+  total_amount: '1 bunch'
+  pickup_instructions: 'side door'
+  status: <%= DonationStatus::CLOSED %>

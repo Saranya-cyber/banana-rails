@@ -11,7 +11,7 @@ class DonorsController < ApplicationController
 		end
 		@donor = Donor.find(id)
 
-		render json: @donor.donations, include: 'claims', status: :ok
+		render json: expire_donations_get_active(@donor.donations), include: 'claims', status: :ok
 	end
 
 	def create

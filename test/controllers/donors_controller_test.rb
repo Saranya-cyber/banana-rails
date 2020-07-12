@@ -55,4 +55,13 @@ class DonorsControllerTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
   end
 
+  test "get donations for donor" do
+    active_donations_in_db = Donation.where status: DonationStatus::ACTIVE
+    assert_equal 2, active_donations_in_db.size, 'should initially have 2 donations with status = active'
+    get '/donors/1/get_donations', headers: auth_header({donor_id: 1})
+    assert_response :success
+    active_donations_api = JSON.parse @response.body
+    assert_equal 1, active_donations_api.size, 'should return only 1 active donation'
+  end
+
 end
