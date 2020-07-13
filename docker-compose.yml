@@ -23,6 +23,13 @@ services:
       - db
     env_file:
     - dev.env
+  ## drops and recreates db so that the fixture data and latest migrations are in place
+  seeder:
+    command: bash -c "rails db:drop && rails db:setup"
+    build: .
+    restart: on-failure
+    depends_on:
+      - db
 volumes:
   pgdata:
   

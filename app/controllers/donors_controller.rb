@@ -11,7 +11,19 @@ class DonorsController < ApplicationController
 		end
 		@donor = Donor.find(id)
 
-		render json: expire_donations_get_active(@donor.donations), include: 'claims', status: :ok
+		render json: expire_donations(@donor.donations), include: 'claims', status: :ok
+	end
+
+	def get_active_donations
+		id = params[:id].to_i
+		authorized_id = decoded_token[0]['donor_id']
+		if id != authorized_id
+			render json: { error: 'Unauthorized' }, status: :forbidden
+			return
+		end
+		active_donations_in_db = Donation.where status: DonationStatus::ACTIVE, donor_id: authorized_id
+
+		render json: expire_donations(active_donations_in_db), include: 'claims', status: :ok
 	end
 
 	def create
