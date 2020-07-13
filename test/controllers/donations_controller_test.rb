@@ -24,4 +24,16 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     post donations_create_url, params: {donation: {}}
     assert_response :unauthorized
   end
+
+  test "active donations returns 1 record and marks another expired" do
+    active_donations = Donation.where status: DonationStatus::ACTIVE
+    assert_equal 2, active_donations.size, 'Should have found two donations with status=active, check donations.yml'
+    get '/donations/active', headers: auth_header({donor_id: 1})
+    assert_response :success
+    active_donations_api = JSON.parse @response.body
+    assert_equal 1, active_donations_api.size, 'should have returned one active donation'
+    assert_equal 'not expired food', active_donations_api[0]['food_name'], 'returned unexpected active donation, check donations.yml'
+    active_donations = Donation.where status: DonationStatus::ACTIVE
+    assert_equal 1, active_donations.size, 'Accessing the active donations through the api should have marked one expired'
+  end
 end

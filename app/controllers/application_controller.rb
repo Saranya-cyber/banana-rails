@@ -44,4 +44,17 @@ class ApplicationController < ActionController::API
     def authorized
       render json: { message: 'Please log in' }, status: :unauthorized unless logged_in?
     end
+
+  def expire_donations_get_active(donations)
+    @active = Array.new
+    donations.each do |donation|
+      if donation.created_at < 1.day.ago
+        donation.status = DonationStatus::EXPIRED
+        donation.save
+      else
+        @active.push donation
+      end
+    end
+    @active
+  end
 end

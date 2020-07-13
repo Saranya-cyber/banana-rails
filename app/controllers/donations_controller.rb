@@ -8,10 +8,8 @@ class DonationsController < ApplicationController
 	end
 
 	def active
-		@active = Donation.all.select do |d|
-			d.status == DonationStatus::ACTIVE
-		end
-		render json: @active
+		@active_donations_in_db = Donation.where status: DonationStatus::ACTIVE
+		render json: expire_donations_get_active(@active_donations_in_db)
 	end
 
 	def show
