@@ -2,7 +2,7 @@ name: Staging deploy
 on:
   push:
     branches:
-      - prealpha/main
+      - get-active-donations-for-donor
 jobs:
   deploy:
     name: deploy to staging
