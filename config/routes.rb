@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   root 'application#authorized'
 
   get 'donors/:id/get_donations', to: 'donors#get_donations'
+  get 'donors/:id/get_active_donations', to: 'donors#get_active_donations'
   post 'donors/:id/activate', to: 'donors#activate'
   patch 'donors/:id/updateStatus', to: 'donors#account_status_update'
   post 'donor_auth', to: 'donor_auth#create'

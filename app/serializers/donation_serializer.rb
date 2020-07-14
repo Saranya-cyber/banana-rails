@@ -7,6 +7,14 @@ class DonationSerializer < ActiveModel::Serializer
     :category,
     :total_amount,
     :pickup_instructions,
-    :status
+    :status,
+    :donor
+  #only return donor address info
+  def donor
+    {address_city: self.object.donor.address_city,
+     address_street: self.object.donor.address_street,
+     address_state: self.object.donor.address_state,
+     address_zip: self.object.donor.address_zip}
+  end
 
 end
