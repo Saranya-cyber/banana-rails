@@ -28,8 +28,11 @@ class DonationsController < ApplicationController
 	def update
 		id = params[:id].to_i
 		@donation = Donation.find(id)
-		if Donation.new(donation_params).valid?
-			@donation.update(donation_params)
+		authorized_id = decoded_token[0]['donor_id']
+		if authorized_id != @donation.donor_id
+			return render json: { error: 'unauthorized'}, status: :unauthorized
+		end
+		if @donation.update(donation_params)
 			render json: { donation: DonationSerializer.new(@donation) }, status: :accepted
 		else
 			render json: { error: 'failed to update donation' }, status: :unprocessable_entity
