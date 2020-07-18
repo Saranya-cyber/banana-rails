@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_08_164629) do
+ActiveRecord::Schema.define(version: 2020_07_07_021812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "hstore"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_164629) do
     t.string "address_city"
     t.string "address_state"
     t.integer "address_zip"
-    t.string "account_status"
+    t.string "account_status", default: "processing"
     t.string "ethnicity"
     t.string "gender"
     t.integer "document_id"
@@ -62,16 +62,13 @@ ActiveRecord::Schema.define(version: 2020_05_08_164629) do
 
   create_table "donations", force: :cascade do |t|
     t.string "food_name"
-    t.string "measurement"
-    t.integer "per_person"
-    t.integer "total_servings"
     t.integer "donor_id"
-    t.integer "duration_minutes"
-    t.string "image_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "canceled", default: false
-    t.string "pickup_location"
+    t.string "category"
+    t.string "total_amount"
+    t.string "pickup_instructions"
+    t.string "status"
   end
 
   create_table "donors", force: :cascade do |t|
@@ -85,7 +82,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_164629) do
     t.string "address_state"
     t.integer "address_zip"
     t.string "business_license"
-    t.string "account_status"
+    t.string "account_status", default: "processing"
     t.string "pickup_instructions"
     t.decimal "latitude", precision: 10, scale: 6
     t.decimal "longitude", precision: 10, scale: 6
@@ -95,6 +92,17 @@ ActiveRecord::Schema.define(version: 2020_05_08_164629) do
     t.string "business_phone_number"
     t.integer "business_doc_id"
     t.string "profile_pic_link"
+  end
+
+  create_table "password_resets", force: :cascade do |t|
+    t.string "reset_token"
+    t.datetime "reset_sent_at"
+    t.string "ip"
+    t.string "resettable_type"
+    t.bigint "resettable_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["resettable_type", "resettable_id"], name: "index_password_resets_on_resettable_type_and_resettable_id"
   end
 
   create_table "rpush_apps", force: :cascade do |t|

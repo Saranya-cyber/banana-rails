@@ -2,9 +2,6 @@ class ApplicationController < ActionController::API
 	before_action :authorized
 
     def encode_token(payload)
-      # should store secret in env variable
-      payload_copy = Marshal.load(Marshal.dump(payload))
-      # puts "encode token:", JWT.encode(payload_copy, 'my_s3cr3t')
       JWT.encode(payload, Rails.application.secrets.secret_key_base)
     end
 
@@ -47,4 +44,17 @@ class ApplicationController < ActionController::API
     def authorized
       render json: { message: 'Please log in' }, status: :unauthorized unless logged_in?
     end
+
+  def expire_donations(donations)
+    @active = Array.new
+    donations.each do |donation|
+      if donation.created_at < 1.day.ago && donation.status == DonationStatus::ACTIVE
+        donation.status = DonationStatus::EXPIRED
+        donation.save
+      else
+        @active.push donation
+      end
+    end
+    @active
+  end
 end

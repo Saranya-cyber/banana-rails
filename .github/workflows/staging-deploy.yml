@@ -1,0 +1,24 @@
+name: Staging deploy
+on:
+  push:
+    branches:
+      - prealpha/main
+jobs:
+  deploy:
+    name: deploy to staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh to staging server, stop services, get fresh checkout, restart services
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STG_SERVER }}
+          key: ${{ secrets.STG_PRIVATE_KEY }}
+          username: ubuntu
+          script: |
+            cd banana-rails || exit 1
+            sudo docker-compose down
+            cd ..
+            sudo rm -rf banana-rails
+            git clone git@github.com:FoodIsLifeBGP/banana-rails.git --depth=1
+            cd banana-rails || exit 1
+            sudo docker-compose up -d

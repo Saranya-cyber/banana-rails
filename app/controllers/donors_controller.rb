@@ -1,5 +1,6 @@
+require 'account_status_helper'
 class DonorsController < ApplicationController
-	skip_before_action :authorized, only: [:create, :account_status]
+    skip_before_action :authorized, only: [:create]
 
 	def get_donations
 		id = params[:id].to_i
@@ -10,53 +11,66 @@ class DonorsController < ApplicationController
 		end
 		@donor = Donor.find(id)
 
-		render json: @donor.donations, include: 'claims', status: :ok
+		render json: expire_donations(@donor.donations), include: 'claims', status: :ok
+	end
+
+	def get_active_donations
+		id = params[:id].to_i
+		authorized_id = decoded_token[0]['donor_id']
+		if id != authorized_id
+			render json: { error: 'Unauthorized' }, status: :forbidden
+			return
+		end
+		active_donations_in_db = Donation.where status: DonationStatus::ACTIVE, donor_id: authorized_id
+
+		render json: expire_donations(active_donations_in_db), include: 'claims', status: :ok
 	end
 
 	def create
 		return render json: { error: 'donor email already in use'}, status: :conflict if Donor.exists?({email: donor_params[:email]})
-		@donor = Donor.create!(donor_params)
+		@donor = Donor.create(donor_params)
 		if @donor.valid?
 			@token = encode_token(donor_id: @donor.id)
 			session[:donor_id] = @donor.id
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
-			render json: { error: 'failed to create donor' }, status: :unprocessable_entity
+			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
 		end
 	end
 
-	def account_status
+	def account_status_update
 		id = params[:id].to_i
 		status = params[:status]
 
-		@donor = Donor.find(id)
-		success_message = { message: "Donor id: #{id} status changed to #{status}. Was: #{@donor.account_status}" }
-		failure_message = { error: "Donor id: #{id} status not changed to #{status}.  Remained: #{@donor.account_status}" }
-
-		case status
-		when 'approved'
-			success = @donor.update_attribute(:account_status, 'approved')
-		when 'pending'
-			success = @donor.update_attribute(:account_status, 'pending')
-		when 'active'
-			success = @donor.update_attribute(:account_status, 'active')
-		when 'suspended'
-			success = @donor.update_attribute(:account_status, 'suspended')
+		@donor = Donor.find_by_id(id)
+		if @donor.nil?
+			 failure_message = { error: "ID: #{params[:id]} not found" }
+			 return render  json: failure_message, status: :not_found
 		end
 
-		success ?
-			(render json: success_message, status: :updated) :
-			(render json: failure_message, status: :unprocessable_entity)
+		response = AccountStatusHelper.account_status("Donor", @donor, status, id)
+		render json: { message: response[:message] }, status: response[:status]
 	end
 
 	def update
-		@donor = Donor.find(params[:id])
+		@donor = Donor.find_by_id(params[:id])
+        if @donor.nil?
+           failure_message = { error: "ID: #{params[:id]} not found" }
+           return render  json: failure_message, status: :not_found
+        end
 		if @donor.update(donor_params)
 			render json: @donor
 		else
-			failure_message = { error: "Donor id: #{params[:id]} was not updated. #{@donor.errors.full_messages}" }
-			puts failure_message
-			render json: failure_message
+			failure_message = {}
+            failure_message['message'] = "Donor id: #{params[:id]} was not updated."
+            failure_message['field_errors'] = []
+            @donor.errors.each do |attr_name, attr_value|
+                message = {}
+                message['field'] = attr_name
+                message['message'] = attr_value
+                failure_message['field_errors'] << message
+            end
+            render json: failure_message, status: :bad_request
 		end
 	end
 
@@ -79,24 +93,20 @@ class DonorsController < ApplicationController
 
 	private
 
-	def donor_params
-		params.require(:donor).permit(
-			:id,
-			:email,
-			:password,
-			:first_name,
-			:last_name,
-			:organization_name,
-			:address_street,
-			:address_city,
-			:address_state,
-			:address_zip,
-			:account_status,
-			:pickup_instructions,
-			# :business_license,
-			# :business_phone_number,
-			# :business_doc_id,
-			# :profile_pic_link
-		)
-	end
+		def donor_params
+			params.require(:donor).permit(
+					:id,
+					:email,
+					:password,
+					:first_name,
+					:last_name,
+					:organization_name,
+					:address_street,
+					:address_city,
+					:address_state,
+					:address_zip,
+					:pickup_instructions
+			)
+		end
 end
+

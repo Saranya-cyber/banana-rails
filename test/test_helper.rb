@@ -9,5 +9,8 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
-  # Add more helper methods to be used by all tests here...
+  def auth_header(payload)
+    {:Authorization => "Bearer #{JWT.encode(payload, Rails.application.secrets.secret_key_base)}"}
+  end
+
 end

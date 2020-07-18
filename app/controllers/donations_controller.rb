@@ -1,19 +1,15 @@
 require 'base64'
 
 class DonationsController < ApplicationController
-	skip_before_action :authorized, only: [:create]
+	before_action :authorized
 
 	def index
 		render json: Donation.all
 	end
 
 	def active
-		@active = Donation.all.select do |d|
-			# Check if each donation is still active based on the time it was created and its duration.
-			# Time.now comes back in seconds, so we divide by 60 to compare in minutes.
-			(Time.now - d.created_at) / 60 < d.duration_minutes
-		end
-		render json: @active
+		@active_donations_in_db = Donation.where status: DonationStatus::ACTIVE
+		render json: expire_donations(@active_donations_in_db)
 	end
 
 	def show
@@ -21,12 +17,11 @@ class DonationsController < ApplicationController
 	end
 
 	def create
-		@donation = Donation.new(donation_params)
+		@donation = Donation.create(donation_params)
 		if @donation.valid?
-			@donation.save
 			render json: { donation: DonationSerializer.new(@donation) }, status: :created
 		else
-			render json: { error: 'failed to create donation' }, status: :unprocessable_entity
+			render json: { error: 'failed to create donation', errors: @donation.errors.full_messages }, status: :unprocessable_entity
 		end
 	end
 
@@ -74,16 +69,12 @@ class DonationsController < ApplicationController
 	def donation_params
 		params.require(:donation).permit(
 			:id,
-			:canceled,
 			:donor_id,
-			:duration_minutes,
+			:category,
 			:food_name,
-			:image_url,
-			:measurement,
-			:per_person,
-			:pickup_location,
-			:start_time,
-			:total_servings
+			:pickup_instructions,
+			:status,
+			:total_amount,
 		)
 	end
 end
