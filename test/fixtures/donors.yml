@@ -10,3 +10,14 @@ first:
   account_status: active
   business_license: 9198DD435AS3456
   organization_name: Ralphs Grocery Store
+second:
+  id: 2
+  email: donor2@donor.com
+  password_digest: $2a$12$hHrN9ZObSjBUT7f4Wg4Kh.EuRYd5sEyyih9zhur1VbFPTVv3zv4vO
+  address_street: 2201 E Madison St
+  address_city: Seattle
+  address_state: Washington
+  address_zip: 98112
+  account_status: active
+  business_license: 8198DD435AS3456
+  organization_name: Safeway Grocery

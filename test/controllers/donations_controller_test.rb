@@ -36,4 +36,17 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     active_donations = Donation.where status: DonationStatus::ACTIVE
     assert_equal 1, active_donations.size, 'Accessing the active donations through the api should have marked one expired'
   end
+
+  test "update donation status succeeds" do
+    patch '/donations/2/update', params: {donation: {id:2, status:DonationStatus::DELETED}}, headers: auth_header({donor_id: 1})
+    assert_response :success
+    donation_in_db = Donation.find_by_id(2)
+    assert_equal DonationStatus::DELETED, donation_in_db.status, 'should have changed status to deleted'
+  end
+
+  test "only updates to donations owned by logged in donor" do
+    patch '/donations/2/update', params: {donation: {id:2, status:DonationStatus::DELETED}}, headers: auth_header({donor_id: 2})
+    assert_response :unauthorized
+  end
+
 end

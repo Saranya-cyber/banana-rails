@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   post 'donors/scan', to: 'donors#scan_qr_code'
 
   post 'donations/create', to: 'donations#create'
-  post 'donations/:id/update', to: 'donations#update'
+  patch 'donations/:id/update', to: 'donations#update'
   post 'donations/:id/claim', to: 'donations#make_claim'
   get 'donations/active', to: 'donations#active'
 
