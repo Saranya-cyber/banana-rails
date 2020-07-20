@@ -32,6 +32,13 @@ class DonorsController < ApplicationController
 		if @donor.valid?
 			@token = encode_token(donor_id: @donor.id)
 			session[:donor_id] = @donor.id
+			#if @user.save
+				# Deliver the signup email
+			#	StatusMailer.send_status_email(@user).deliver
+			#	redirect_to(@user, :notice => 'User created')
+			#
+			#	render :action => 'new'
+			#end
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
 			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
@@ -46,6 +53,13 @@ class DonorsController < ApplicationController
 		if @donor.nil?
 			 failure_message = { error: "ID: #{params[:id]} not found" }
 			 return render  json: failure_message, status: :not_found
+		end
+		if @user.save
+			# Deliver the signup email
+			StatusMailer.send_status_email(@user).deliver
+			redirect_to(@user, :notice => 'User created')
+		else
+			render :action => 'new'
 		end
 
 		response = AccountStatusHelper.account_status("Donor", @donor, status, id)
