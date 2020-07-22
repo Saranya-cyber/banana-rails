@@ -36,4 +36,10 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     active_donations = Donation.where status: DonationStatus::ACTIVE
     assert_equal 1, active_donations.size, 'Accessing the active donations through the api should have marked one expired'
   end
+
+  test "make sure that we return the latitude and longitude for a donation" do
+    get '/donations/active', headers: auth_header({donor_id: 1})
+    active_donations_api = JSON.parse @response.body
+    assert_not_nil active_donations_api[0]['donor']['latitude']
+  end
 end
