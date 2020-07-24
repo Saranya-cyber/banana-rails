@@ -454,7 +454,6 @@ def create_claim(client_id, donation_id, completed)
 		client_id: client_id,
 		donation_id: donation_id,
 		qr_code: Base64.encode64({ 'client_id': client_id, 'donation_id': donation_id }.to_json).chomp,
-		time_claimed: Time.now,
 		status: ClaimStatus::CLOSED
 	)
 end
