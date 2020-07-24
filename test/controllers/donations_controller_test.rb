@@ -56,4 +56,11 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil active_donations_api[0]['donor']['latitude']
   end
 
+  test "claiming a donation adds a claims table record and changes the donation status to claimed" do
+    assert_equal DonationStatus::ACTIVE, Donation.find_by_id(2).status, 'Donation status should start as active'
+    post '/donations/2/claim', params: {client_id: 1}, headers: auth_header({client_id: 1})
+    assert_equal 1, Claim.find_by_donation_id(2).client_id, 'there should now be a claims record'
+    assert_equal DonationStatus::CLAIMED, Donation.find_by_id(2).status, 'Donation status should now be claimed'
+  end
+
 end
