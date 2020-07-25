@@ -29,17 +29,9 @@
                             line-height: 27px;
                             color: #083A9B;"
                         >
-                        <!-- @user.first_name is the variable where we pass in user's name. 
-
-                            Pass in one of these possible messages:
-                            You've got a new password.
-                            Here is your token.
-                            We have received your application.
-                            Your account is now approved.
-                            Your account is account is temporarily suspended
-                        -->
+                        <!-- @user.first_name is the variable where we pass in user's name. -->
                             Hi <%= @user.first_name %>,<br/>
-                            <%= message_variable_1_goes_here %>
+                            You've got a new password.
                         </td>
                     </tr>
                     <tr>
@@ -52,11 +44,7 @@
                             line-height: 22px;
                             color: #083A9B;"
                         >
-                        <!-- This section should be a variable where we pass in the correct message.
-                            Possible Messages:
                             Your Banana App password has been updated successfully.
-                        -->
-                            <%= message_variable_2_goes_here %>
                         </td>
                     </tr>
                     <tr>
@@ -69,7 +57,6 @@
                             line-height: 22px;
                             color: #083A9B;"
                         >
-                        <!-- Use variables to modify test based on email type. -->
                             If you didn't reset your password, visit <a href="https://www.bananaapp.org" style="color: #083A9B; font-weight: bold; text-decoration: none;">www.bananaapp.org</a> or email us at <a href="mailto:info@bananaapp.org" style="color: #083A9B; font-weight: bold; text-decoration: none;">info@bananaapp.org</a> so we can help secure your account.
                         </td>
                     </tr>
