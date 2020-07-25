@@ -29,8 +29,8 @@
                             line-height: 27px;
                             color: #083A9B;"
                         >
-                        <!-- Firstname should be a variable where we pass in user's name. -->
-                            Hi Firstname,<br/>
+                        <!-- @user.first_name is the variable where we pass in user's name. -->
+                            Hi <%= @user.first_name %>,<br/>
                             You've got a new password.
                         </td>
                     </tr>
@@ -59,7 +59,7 @@
                             color: #083A9B;"
                         >
                         <!-- Use variables to modify test based on email type. -->
-                            If you didn't reset your password, visit <a href="https://www.bananaapp.org" style="color: #083A9B; font-weight: bold; text-decoration: none;">www.bananaapp.org</a> or email us at <b>info@bananaapp.org</b> so we can help secure your account.
+                            If you didn't reset your password, visit <a href="https://www.bananaapp.org" style="color: #083A9B; font-weight: bold; text-decoration: none;">www.bananaapp.org</a> or email us at <a href="mailto:info@bananaapp.org" style="color: #083A9B; font-weight: bold; text-decoration: none;">info@bananaapp.org</a> so we can help secure your account.
                         </td>
                     </tr>
                     <tr>
@@ -100,7 +100,8 @@
                             color: #083A9B;
                             text-align: center;"
                         >
-                            Unsubscribe | Terms & Conditions
+                        <!-- Add link address to Unsubscribe. -->
+                        <a href="#" style="text-decoration: none;">Unsubscribe</a> | <a href="https://www.bananaapp.org/Terms" style="text-decoration: none;">Terms & Conditions</a>
                         </td>
                     </tr>
                 </table>    
