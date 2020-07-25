@@ -28,6 +28,7 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
   test "active donations returns 1 record and marks another expired" do
     active_donations = Donation.where status: DonationStatus::ACTIVE
     assert_equal 2, active_donations.size, 'Should have found two donations with status=active, check donations.yml'
+    assert_equal ClaimStatus::ACTIVE, Claim.find(2).status, 'Claim status should start as active'
     get '/donations/active', headers: auth_header({donor_id: 1})
     assert_response :success
     active_donations_api = JSON.parse @response.body
@@ -35,6 +36,8 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'not expired food', active_donations_api[0]['food_name'], 'returned unexpected active donation, check donations.yml'
     active_donations = Donation.where status: DonationStatus::ACTIVE
     assert_equal 1, active_donations.size, 'Accessing the active donations through the api should have marked one expired'
+    now_expired_claim = Claim.find(2)
+    assert_equal ClaimStatus::EXPIRED, now_expired_claim.status, 'This claim should have been expired'
   end
 
 

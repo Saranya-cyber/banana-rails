@@ -49,6 +49,9 @@ class ApplicationController < ActionController::API
     donations.each do |donation|
       if donation.created_at < 1.day.ago && donation.status == DonationStatus::ACTIVE
         donation.status = DonationStatus::EXPIRED
+        donation.claims.each do |claim|
+          claim.status = ClaimStatus::EXPIRED
+        end
         donation.save
       else
         @active.push donation
