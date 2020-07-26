@@ -39,6 +39,17 @@ class DonorsController < ApplicationController
 			#
 			#	render :action => 'new'
 			#end
+
+			if @donor.save
+				# Tell the UserMailer to send a welcome email after save
+				StatusMailer.with(user: @donor).send_status_email(@donor).deliver_now
+				
+				format.html { redirect_to(@donor, notice: 'User was successfully created.') }
+				format.json { render json: @donor, status: :created, location: @donor }
+			  else
+				format.html { render action: 'new' }
+				format.json { render json: @donor.errors, status: :unprocessable_entity }
+			end
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
 			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
@@ -54,12 +65,15 @@ class DonorsController < ApplicationController
 			 failure_message = { error: "ID: #{params[:id]} not found" }
 			 return render  json: failure_message, status: :not_found
 		end
-		if @user.save
-			# Deliver the signup email
-			StatusMailer.send_status_email(@user).deliver
-			redirect_to(@user, :notice => 'User created')
+		if @donor.save
+		  # Tell the UserMailer to send a welcome email after save
+		  	StatusMailer.with(user: @donor).send_status_email(@donor).deliver_now
+	   
+			format.html { redirect_to(@donor, notice: 'User status was successfully updated.') }
+			format.json { render json: @donor, status: :created, location: @donor }
 		else
-			render :action => 'new'
+			format.html { render action: 'new' }
+			format.json { render json: @donor.errors, status: :unprocessable_entity }
 		end
 
 		response = AccountStatusHelper.account_status("Donor", @donor, status, id)
