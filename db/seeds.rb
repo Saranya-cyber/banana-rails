@@ -9,10 +9,10 @@ Donor.destroy_all
 puts "Seeding Donors..."
 
 donor1 = Donor.create!(
-	first_name: "Nancy",
+	first_name: "Joseph",
 	last_name: "McFood",
 	organization_name: "Foods 4 U",
-	email: "donor@donor.com",
+	email: "josephtrettevik@gmail.com",
 	password: "donor@123",
 	address_street: "704 Terry Ave",
 	address_city: "Seattle",
@@ -454,9 +454,7 @@ def create_claim(client_id, donation_id, completed)
 		client_id: client_id,
 		donation_id: donation_id,
 		qr_code: Base64.encode64({ 'client_id': client_id, 'donation_id': donation_id }.to_json).chomp,
-		completed: completed,
-		time_claimed: Time.now,
-		canceled: false
+		status: ClaimStatus::CLOSED
 	)
 end
 

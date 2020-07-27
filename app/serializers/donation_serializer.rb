@@ -14,7 +14,9 @@ class DonationSerializer < ActiveModel::Serializer
     {address_city: self.object.donor.address_city,
      address_street: self.object.donor.address_street,
      address_state: self.object.donor.address_state,
-     address_zip: self.object.donor.address_zip}
+     address_zip: self.object.donor.address_zip,
+     latitude: self.object.donor.latitude,
+     longitude: self.object.donor.longitude}
   end
 
 end
