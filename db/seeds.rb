@@ -9,10 +9,10 @@ Donor.destroy_all
 puts "Seeding Donors..."
 
 donor1 = Donor.create!(
-	first_name: "Nancy",
+	first_name: "Joseph",
 	last_name: "McFood",
 	organization_name: "Foods 4 U",
-	email: "donor@donor.com",
+	email: "josephtrettevik@gmail.com",
 	password: "donor@123",
 	address_street: "704 Terry Ave",
 	address_city: "Seattle",
