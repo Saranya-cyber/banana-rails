@@ -32,26 +32,14 @@ class DonorsController < ApplicationController
 		if @donor.valid?
 			@token = encode_token(donor_id: @donor.id)
 			session[:donor_id] = @donor.id
-			#if @user.save
-				# Deliver the signup email
-			#	StatusMailer.send_status_email(@user).deliver
-			#	redirect_to(@user, :notice => 'User created')
-			#
-			#	render :action => 'new'
-			#end
 
 			if @donor.save
-				# Tell the UserMailer to send a welcome email after save
-				StatusMailer.with(user: @donor).send_status_email(@donor).deliver_now
-				
-				format.html { redirect_to(@donor, notice: 'User was successfully created.') }
-				format.json { render json: @donor, status: :created, location: @donor }
-			  else
-				format.html { render action: 'new' }
-				format.json { render json: @donor.errors, status: :unprocessable_entity }
+				# Tell the StatusMailer to send a welcome email after save
+				StatusMailer.with(user: @donor).received_application(@donor).deliver_later
 			end
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
+			StatusMailer.with(user: @donor).account_incomplete(@donor).deliver_later
 			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
 		end
 	end
@@ -65,18 +53,13 @@ class DonorsController < ApplicationController
 			 failure_message = { error: "ID: #{params[:id]} not found" }
 			 return render  json: failure_message, status: :not_found
 		end
-		if @donor.save
-		  # Tell the UserMailer to send a welcome email after save
-		  	StatusMailer.with(user: @donor).send_status_email(@donor).deliver_now
-	   
-			format.html { redirect_to(@donor, notice: 'User status was successfully updated.') }
-			format.json { render json: @donor, status: :created, location: @donor }
-		else
-			format.html { render action: 'new' }
-			format.json { render json: @donor.errors, status: :unprocessable_entity }
-		end
-
 		response = AccountStatusHelper.account_status("Donor", @donor, status, id)
+		case status
+			when "suspended"
+				StatusMailer.with(user: @donor).account_suspended(@donor).deliver_later
+			when "approved"
+				StatusMailer.with(user: @donor).donor_approved(@donor).deliver_later
+		end
 		render json: { message: response[:message] }, status: response[:status]
 	end
 
