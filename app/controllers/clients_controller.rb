@@ -34,7 +34,7 @@ class ClientsController < ApplicationController
       end
       
       response = AccountStatusHelper.account_status("Client", @client, status, id)
-      if status = "approved"
+      if status == "approved"
         StatusMailer.with(user: @client).client_approved(@client).deliver_later
       end
       render json: { message: response[:message] }, status: response[:status]
