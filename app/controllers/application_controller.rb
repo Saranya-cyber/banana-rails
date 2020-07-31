@@ -45,18 +45,18 @@ class ApplicationController < ActionController::API
     end
 
   def expire_donations(donations)
-    @active = Array.new
+    active = Array.new
     donations.each do |donation|
-      if donation.created_at < 1.day.ago && donation.status == DonationStatus::ACTIVE
+      if donation.created_at < 1.day.ago && (donation.status == DonationStatus::ACTIVE || donation.status == DonationStatus::CLAIMED)
         donation.status = DonationStatus::EXPIRED
         donation.claims.select {|c| c.status == ClaimStatus::ACTIVE}.each do |claim|
           claim.status = ClaimStatus::EXPIRED
         end
         donation.save
       else
-        @active.push donation
+        active.push donation
       end
     end
-    @active
+    active
   end
 end

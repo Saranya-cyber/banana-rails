@@ -62,8 +62,22 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
   test "claiming a donation adds a claims table record and changes the donation status to claimed" do
     assert_equal DonationStatus::ACTIVE, Donation.find_by_id(2).status, 'Donation status should start as active'
     post '/donations/2/claim', params: {client_id: 1}, headers: auth_header({client_id: 1})
+    assert_response :success
     assert_equal 1, Claim.find_by_donation_id(2).client_id, 'there should now be a claims record'
     assert_equal DonationStatus::CLAIMED, Donation.find_by_id(2).status, 'Donation status should now be claimed'
+  end
+
+  test "passing client coords includes distance value for donations" do
+    get '/donations/active', params: {client_lat: 47.609175 , client_long: -122.325849}, headers: auth_header({client_id: 1})
+    res_obj = JSON.parse @response.body
+    assert_not_nil res_obj[0]['distance']
+  end
+
+  test "passing client coords filters out results that are more than 20 miles away" do
+    get '/donations/active', params: {client_lat: 46.609175 , client_long: -122.325849}, headers: auth_header({client_id: 1})
+    res_obj = JSON.parse @response.body
+    assert_equal [], res_obj, 'should have returned empty array'
+
   end
 
 end

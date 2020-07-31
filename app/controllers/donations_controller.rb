@@ -2,14 +2,24 @@ require 'base64'
 
 class DonationsController < ApplicationController
 	before_action :authorized
+	SEARCH_RADIUS_MILES = 20
 
 	def index
 		render json: Donation.all
 	end
 
+
 	def active
 		@active_donations_in_db = Donation.where status: DonationStatus::ACTIVE
-		render json: expire_donations(@active_donations_in_db)
+		non_expired_donations = expire_donations(@active_donations_in_db)
+		if params[:client_lat] && params[:client_long]
+			client_coords = [params[:client_lat].to_f, params[:client_long].to_f]
+			nearby_donor_ids = Donor.near(client_coords, SEARCH_RADIUS_MILES).map(&:id)
+			nearby_available_donations = non_expired_donations.select { |d| nearby_donor_ids.include?(d.donor_id) }
+			nearby_available_donations.each {|d| d.distance = d.donor.distance_to(client_coords)}
+			return render json: nearby_available_donations
+		end
+		render json: non_expired_donations
 	end
 
 	def show
