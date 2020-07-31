@@ -54,13 +54,16 @@ class DonationsController < ApplicationController
 			client_id: params[:client_id],
 			donation_id: params[:id],
 			qr_code: qr_code,
-			completed: false,
-			time_claimed: Time.now,
-			canceled: false,
+			status: ClaimStatus::ACTIVE,
 		}
 		@claim = Claim.new(claim_params)
+		claimed_donation = Donation.find(donation_id)
+		claimed_donation.status = DonationStatus::CLAIMED
 		if @claim.valid?
-			@claim.save
+			Claim.transaction do
+				@claim.save
+				claimed_donation.save
+			end
 			render json: { claim: ClaimSerializer.new(@claim) }, status: :accepted
 		else
 			render json: { error: 'failed to create claim' }, status: :unprocessable_entity

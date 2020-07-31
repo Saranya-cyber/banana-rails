@@ -1,12 +1,14 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
   client_id: 1
   donation_id: 1
   qr_code: MyString
   status: <%= ClaimStatus::CLOSED %>
 
 two:
+  id: 2
   client_id: 1
   donation_id: 1
   qr_code: MyString

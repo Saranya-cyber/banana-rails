@@ -1,7 +1,7 @@
 class Donation < ApplicationRecord
 
 	belongs_to :donor
-	has_many :claims
+	has_many :claims, autosave: true
 
 	validates :food_name, presence: true
 	validates :category, presence: true

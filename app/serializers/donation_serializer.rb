@@ -16,7 +16,8 @@ class DonationSerializer < ActiveModel::Serializer
      address_state: self.object.donor.address_state,
      address_zip: self.object.donor.address_zip,
      latitude: self.object.donor.latitude,
-     longitude: self.object.donor.longitude}
+     longitude: self.object.donor.longitude,
+     donor_name: self.object.donor.organization_name}
   end
 
 end
