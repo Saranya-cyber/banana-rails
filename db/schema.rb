@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_24_014011) do
+ActiveRecord::Schema.define(version: 2020_08_01_012821) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "hstore"
@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(version: 2020_07_24_014011) do
     t.string "business_phone_number"
     t.integer "business_doc_id"
     t.string "profile_pic_link"
+    t.index ["latitude", "longitude"], name: "index_donors_on_latitude_and_longitude"
   end
 
   create_table "password_resets", force: :cascade do |t|
