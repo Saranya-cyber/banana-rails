@@ -13,3 +13,10 @@ two:
   donation_id: 1
   qr_code: MyString
   status: <%= ClaimStatus::ACTIVE %>
+
+three:
+  id: 3
+  client_id: 1
+  donation_id: 4
+  qr_code: Foobar
+  status: <%= ClaimStatus::ACTIVE %>

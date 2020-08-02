@@ -177,6 +177,24 @@ donor10 = Donor.create(
 	business_doc_id: '8675309',
 	profile_pic_link: 'http://www.link.com'
 )
+#begin Boston area donors (testing for dhite)
+donor11 = Donor.create(
+		first_name: "Grady",
+		last_name: "Little",
+		organization_name: "Whole Foods Market",
+		email: "donor11@donor11.com",
+		password: "donor10@123",
+		address_street: '27 Austin St',
+		address_city: 'Charlestown',
+		address_state: 'MA',
+		address_zip: '02129',
+		business_license: "123456789",
+		account_status: "approved",
+		pickup_instructions: 'Please go to the front desk.',
+		business_phone_number: '8675309',
+		business_doc_id: '8675309',
+		profile_pic_link: 'http://www.link.com'
+)
 
 puts "Seeding Donations..."
 
@@ -235,6 +253,23 @@ donation9 = Donation.create(
   category: DonationCategory::DAIRY,
   total_amount: "3 gallons",
   status: DonationStatus::ACTIVE
+)
+
+donation10 = Donation.create(
+		food_name: "Milk",
+		donor_id: donor11.id,
+		pickup_instructions: 'front desk',
+		category: DonationCategory::DAIRY,
+		total_amount: "3 gallons",
+		status: DonationStatus::ACTIVE
+)
+donation11 = Donation.create(
+		food_name: "Leftovers from a meeting",
+		donor_id: donor11.id,
+		pickup_instructions: 'in the warehouse',
+		category: DonationCategory::HOT_MEAL,
+		total_amount: "3 dinner plates",
+		status: DonationStatus::ACTIVE
 )
 ## Either delete or migrate these to new table format
 # donation10 = Donation.create(

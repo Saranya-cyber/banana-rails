@@ -10,7 +10,6 @@ class DonorsController < ApplicationController
 			return
 		end
 		@donor = Donor.find(id)
-
 		render json: expire_donations(@donor.donations), include: 'claims', status: :ok
 	end
 
@@ -21,7 +20,7 @@ class DonorsController < ApplicationController
 			render json: { error: 'Unauthorized' }, status: :forbidden
 			return
 		end
-		active_donations_in_db = Donation.where status: DonationStatus::ACTIVE, donor_id: authorized_id
+		active_donations_in_db = Donation.where status: [DonationStatus::ACTIVE, DonationStatus::CLAIMED], donor_id: authorized_id
 
 		render json: expire_donations(active_donations_in_db), include: 'claims', status: :ok
 	end

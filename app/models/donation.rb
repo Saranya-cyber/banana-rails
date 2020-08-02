@@ -1,5 +1,5 @@
 class Donation < ApplicationRecord
-
+	attr_accessor :distance
 	belongs_to :donor
 	has_many :claims, autosave: true
 

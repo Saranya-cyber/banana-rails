@@ -56,19 +56,22 @@ class DonorsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "get donations for donor" do
-    active_donations_in_db = Donation.where status: DonationStatus::ACTIVE
-    assert_equal 2, active_donations_in_db.size, 'should initially have 2 donations with status = active'
+    donations_for_donor = Donation.where donor_id: 1
+    assert_equal 4, donations_for_donor.size, 'should have 4 donations belonging to donor_id = 1'
     get '/donors/1/get_donations', headers: auth_header({donor_id: 1})
     assert_response :success
     donations_api = JSON.parse @response.body
-    assert_equal 2, donations_api.size, 'should return 2 donations'
+    assert_equal 3, donations_api.size, 'should return 3 donations, with one expiring'
   end
 
   test "get active donations for donor" do
     get '/donors/1/get_active_donations', headers: auth_header({donor_id: 1})
     assert_response :success
     active_donations_api = JSON.parse @response.body
-    assert_equal 1, active_donations_api.size, 'should return only 1 active donation'
+    assert_equal 2, active_donations_api.size, 'should return one active and one claimed donation'
+    statuses = active_donations_api.map{|d| d['status']}
+    assert statuses.include?(DonationStatus::ACTIVE)
+    assert statuses.include?(DonationStatus::CLAIMED)
   end
 
 end

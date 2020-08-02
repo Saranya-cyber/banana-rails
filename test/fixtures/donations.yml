@@ -26,3 +26,12 @@ closed:
   total_amount: '1 bunch'
   pickup_instructions: 'side door'
   status: <%= DonationStatus::CLOSED %>
+anotherActive:
+  id: 4
+  donor_id: 1
+  food_name: 'Cheese'
+  created_at: <%= 2.hours.ago %>
+  category: <%= DonationCategory::DAIRY %>
+  total_amount: '5 pounds'
+  pickup_instructions: 'Around the back'
+  status: <%= DonationStatus::CLAIMED %>

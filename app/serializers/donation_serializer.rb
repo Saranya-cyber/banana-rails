@@ -8,6 +8,7 @@ class DonationSerializer < ActiveModel::Serializer
     :total_amount,
     :pickup_instructions,
     :status,
+    :distance,
     :donor
   #only return donor address info
   def donor
