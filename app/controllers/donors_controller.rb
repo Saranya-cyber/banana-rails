@@ -39,7 +39,8 @@ class DonorsController < ApplicationController
 			end
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
-			StatusMailer.with(user: @donor).account_incomplete(@donor).deliver_later
+			not_created_user = {email: @donor.email, first_name: @donor.first_name}
+			StatusMailer.with(user: not_created_user).account_incomplete(not_created_user).deliver_later
 			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
 		end
 	end
