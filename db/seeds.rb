@@ -204,13 +204,13 @@ donation1 = Donation.create!(
   category: DonationCategory::PRODUCE,
 	pickup_instructions: 'front desk',
   total_amount: '20 bunches',
-  status: DonationStatus::ACTIVE,
+  status: DonationStatus::CLAIMED,
 )
 donation2 = Donation.create(
 	food_name: "Apples",
 	donor_id: donor2.id,
 	pickup_instructions: 'front desk',
-	status: DonationStatus::CLOSED,
+	status: DonationStatus::CLAIMED,
   total_amount: '2 dozen apples',
   category: DonationCategory::PRODUCE
 )
@@ -489,7 +489,7 @@ def create_claim(client_id, donation_id, completed)
 		client_id: client_id,
 		donation_id: donation_id,
 		qr_code: Base64.encode64({ 'client_id': client_id, 'donation_id': donation_id }.to_json).chomp,
-		status: ClaimStatus::CLOSED
+		status: completed ? ClaimStatus::CLOSED : ClaimStatus::ACTIVE
 	)
 end
 
@@ -497,15 +497,6 @@ claims = [
 	[client1.id, donation1.id, true],
 	[client1.id, donation2.id, false],
 	[client1.id, donation3.id, false],
-	[client2.id, donation4.id, false],
-	[client2.id, donation5.id, false],
-	[client2.id, donation6.id, true],
-	[client3.id, donation1.id, false],
-	[client3.id, donation2.id, false],
-	[client3.id, donation3.id, false],
-	[client3.id, donation4.id, true],
-	[client3.id, donation5.id, false],
-	[client3.id, donation6.id, false],
 ]
 
 claims.each { |c| create_claim(*c) }

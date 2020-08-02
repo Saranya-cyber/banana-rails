@@ -23,7 +23,8 @@ class DonationSerializer < ActiveModel::Serializer
   end
 
   def claim
-    self.object.claims[0].nil? ? nil : {client_name: self.object.claims[0].client.first_name}
+    self.object.claims[0].nil? ? nil : {client_name: self.object.claims[0].client.first_name,
+                                        qr_code: self.object.claims[0].qr_code}
   end
 
 end
