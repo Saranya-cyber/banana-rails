@@ -32,8 +32,15 @@ class DonorsController < ApplicationController
 		if @donor.valid?
 			@token = encode_token(donor_id: @donor.id)
 			session[:donor_id] = @donor.id
+
+			if @donor.save
+				# Tell the StatusMailer to send a welcome email after save
+				StatusMailer.with(user: @donor).received_application(@donor).deliver_later
+			end
 			render json: { donor: DonorSerializer.new(@donor), jwt: @token }, status: :created
 		else
+			not_created_user = {email: @donor.email, first_name: @donor.first_name}
+			StatusMailer.with(user: not_created_user).account_incomplete(not_created_user).deliver_later
 			render json: { error: 'failed to create client', errors: @donor.errors.full_messages }, status: :bad_request
 		end
 	end
@@ -47,8 +54,13 @@ class DonorsController < ApplicationController
 			 failure_message = { error: "ID: #{params[:id]} not found" }
 			 return render  json: failure_message, status: :not_found
 		end
-
 		response = AccountStatusHelper.account_status("Donor", @donor, status, id)
+		case status
+			when "suspended"
+				StatusMailer.with(user: @donor).account_suspended(@donor).deliver_later
+			when "approved"
+				StatusMailer.with(user: @donor).donor_approved(@donor).deliver_later
+		end
 		render json: { message: response[:message] }, status: response[:status]
 	end
 
